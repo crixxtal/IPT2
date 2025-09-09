@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Firebase CRUD Operations - Complete Cheat Sheet</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        background-color: #f5f7fa;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      .content {
+        padding: 30px;
+      }
+
+      .section {
+        margin-bottom: 40px;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
+        color: #2d3748;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #667eea;
+        display: flex;
+        align-items: center;
+      }
+
+      .section-title::before {
+        content: "🔥";
+        margin-right: 10px;
+        font-size: 1.5rem;
+      }
+
+      .subsection {
+        margin-bottom: 30px;
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
+        border-left: 4px solid #667eea;
+      }
+
+      .subsection-title {
+        font-size: 1.3rem;
+        color: #4a5568;
+        margin-bottom: 15px;
+        font-weight: 600;
+      }
+
+      .code-block {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 15px 0;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .code-block pre {
+        margin: 0;
+      }
+
+      .inline-code {
+        background: #e2e8f0;
+        color: #2d3748;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+      }
+
+      .note {
+        background: #fef5e7;
+        border: 1px solid #f6e05e;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #744210;
+      }
+
+      .note::before {
+        content: "💡 ";
+        font-weight: bold;
+      }
+
+      .warning {
+        background: #fed7d7;
+        border: 1px solid #fc8181;
+        border-radius: 6px;
+        padding: 15px;
+        margin: 15px 0;
+        color: #742a2a;
+      }
+
+      .warning::before {
+        content: "⚠️ ";
+        font-weight: bold;
+      }
+
+      .toc {
+        background: #edf2f7;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+      }
+
+      .toc h3 {
+        color: #2d3748;
+        margin-bottom: 15px;
+      }
+
+      .toc ul {
+        list-style: none;
+        padding-left: 0;
+      }
+
+      .toc li {
+        margin-bottom: 8px;
+      }
+
+      .toc a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .toc a:hover {
+        text-decoration: underline;
+      }
+
+      .method-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .method-card {
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        transition: transform 0.2s, border-color 0.2s;
+      }
+
+      .method-card:hover {
+        transform: translateY(-2px);
+        border-color: #667eea;
+      }
+
+      .method-title {
+        color: #667eea;
+        font-weight: bold;
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+      }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+
+      .modal-content {
+        background-color: #2d3748;
+        margin: 2% auto;
+        padding: 0;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 1200px;
+        max-height: 90vh;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        animation: modalAppear 0.3s ease-out;
+      }
+
+      @keyframes modalAppear {
+        from {
+          opacity: 0;
+          transform: scale(0.8) translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .modal-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+      }
+
+      .close {
+        color: white;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 50%;
+        transition: background-color 0.2s;
+      }
+
+      .close:hover,
+      .close:focus {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .modal-body {
+        padding: 0;
+        max-height: calc(90vh - 80px);
+        overflow-y: auto;
+      }
+
+      .modal-code {
+        background: #2d3748;
+        color: #e2e8f0;
+        padding: 30px;
+        font-family: "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .code-block {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+      }
+
+      .code-block:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+      }
+
+      .code-block::before {
+        content: "🔍 Click to expand";
+        position: absolute;
+        top: 10px;
+        left: 20px;
+        background: rgba(102, 126, 234, 0.9);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        opacity: 0;
+        transition: opacity 0.2s;
+        z-index: 1;
+      }
+
+      .code-block:hover::before {
+        opacity: 1;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: #4a5568;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        z-index: 2;
+        transition: background-color 0.2s;
+      }
+
+      .copy-btn:hover {
+        background: #667eea;
+      }
+
+      .modal-copy-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background-color 0.2s;
+      }
+
+      .modal-copy-btn:hover {
+        background: #5a67d8;
+      }
+
+      @media (max-width: 768px) {
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .content {
+          padding: 20px;
+        }
+
+        .section-title {
+          font-size: 1.5rem;
+        }
+
+        .modal-content {
+          width: 95%;
+          margin: 5% auto;
+        }
+
+        .modal-header {
+          padding: 15px 20px;
+        }
+
+        .modal-title {
+          font-size: 1.2rem;
+        }
+
+        .modal-code {
+          padding: 20px;
+          font-size: 12px;
+        }
+
+        .modal-copy-btn {
+          position: relative;
+          top: auto;
+          right: auto;
+          margin-bottom: 15px;
+          display: block;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Modal -->
+    <div id="codeModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="modalTitle">Code Example</h3>
+          <button class="close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <button class="modal-copy-btn" id="modalCopyBtn">📋 Copy Code</button>
+          <pre class="modal-code" id="modalCode"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="header">
+        <h1>Firebase CRUD Operations</h1>
+        <p>
+          Complete Cheat Sheet - Create, Read, Update, Delete with Firestore
+        </p>
+      </div>
+
+      <div class="content">
+        <!-- Table of Contents -->
+        <div class="toc">
+          <h3>📚 Table of Contents</h3>
+          <ul>
+            <li><a href="#setup">1. Firebase Setup & Configuration</a></li>
+            <li><a href="#create">2. Create Operations</a></li>
+            <li><a href="#read">3. Read Operations (Select)</a></li>
+            <li><a href="#update">4. Update Operations</a></li>
+            <li><a href="#delete">5. Delete Operations</a></li>
+            <li><a href="#advanced">6. Advanced Operations</a></li>
+            <li><a href="#realtime">7. Real-time Listeners</a></li>
+            <li><a href="#batch">8. Batch Operations</a></li>
+            <li><a href="#transactions">9. Transactions</a></li>
+            <li><a href="#best-practices">10. Best Practices & Security</a></li>
+          </ul>
+        </div>
+
+        <!-- Firebase Setup -->
+        <section id="setup" class="section">
+          <h2 class="section-title">Firebase Setup & Configuration</h2>
+
+          <div class="subsection">
+            <h3 class="subsection-title">1. Install Firebase</h3>
+            <div class="code-block">
+              <pre>npm install firebase</pre>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3 class="subsection-title">2. Initialize Firebase</h3>
+            <div class="code-block">
+              <pre>
+// firebase.js
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+
+const firebaseConfig = {
+  apiKey: "your-api-key",
+  authDomain: "your-project.firebaseapp.com",
+  projectId: "your-project-id",
+  storageBucket: "your-project.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "your-app-id"
+};
+
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const auth = getAuth(app);</pre
+              >
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3 class="subsection-title">3. Import in Components</h3>
+            <div class="code-block">
+              <pre>
+import { db } from './firebase.js';
+import { 
+  collection, 
+  doc, 
+  getDocs, 
+  getDoc, 
+  addDoc, 
+  setDoc, 
+  updateDoc, 
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot
+} from 'firebase/firestore';</pre
+              >
+            </div>
+          </div>
+        </section>
+
+        <!-- Create Operations -->
+        <section id="create" class="section">
+          <h2 class="section-title">Create Operations</h2>
+
+          <div class="method-grid">
+            <div class="method-card">
+              <div class="method-title">Add Document (Auto ID)</div>
+              <div class="code-block">
+                <pre>
+// Add document with auto-generated ID
+const addUser = async (userData) => {
+  try {
+    const docRef = await addDoc(collection(db, "users"), {
+      name: userData.name,
+      email: userData.email,
+      age: userData.age,
+      createdAt: new Date()
+    });
+    console.log("Document written with ID: ", docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error("Error adding document: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Set Document (Custom ID)</div>
+              <div class="code-block">
+                <pre>
+// Set document with custom ID
+const createUserWithId = async (userId, userData) => {
+  try {
+    await setDoc(doc(db, "users", userId), {
+      name: userData.name,
+      email: userData.email,
+      age: userData.age,
+      createdAt: new Date()
+    });
+    console.log("Document created with ID: ", userId);
+  } catch (error) {
+    console.error("Error creating document: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Merge Data (Update or Create)</div>
+              <div class="code-block">
+                <pre>
+// Merge data (update existing or create new)
+const mergeUserData = async (userId, userData) => {
+  try {
+    await setDoc(doc(db, "users", userId), userData, { 
+      merge: true 
+    });
+    console.log("Document merged successfully");
+  } catch (error) {
+    console.error("Error merging document: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Batch Create</div>
+              <div class="code-block">
+                <pre>
+// Create multiple documents at once
+import { writeBatch } from 'firebase/firestore';
+
+const createMultipleUsers = async (usersArray) => {
+  const batch = writeBatch(db);
+  
+  usersArray.forEach((userData) => {
+    const newDocRef = doc(collection(db, "users"));
+    batch.set(newDocRef, {
+      ...userData,
+      createdAt: new Date()
+    });
+  });
+  
+  try {
+    await batch.commit();
+    console.log("Batch write successful");
+  } catch (error) {
+    console.error("Batch write failed: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Read Operations -->
+        <section id="read" class="section">
+          <h2 class="section-title">Read Operations (Select)</h2>
+
+          <div class="subsection">
+            <h3 class="subsection-title">Single Document Select</h3>
+            <div class="method-grid">
+              <div class="method-card">
+                <div class="method-title">Get Single Document by ID</div>
+                <div class="code-block">
+                  <pre>
+// Get single document by ID
+const getUserById = async (userId) => {
+  try {
+    const docRef = doc(db, "users", userId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      console.log("Document data:", docSnap.data());
+      return { id: docSnap.id, ...docSnap.data() };
+    } else {
+      console.log("No such document!");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting document: ", error);
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">
+                  Get First Document Matching Query
+                </div>
+                <div class="code-block">
+                  <pre>
+// Get first document matching condition
+const getFirstUserByEmail = async (email) => {
+  try {
+    const q = query(
+      collection(db, "users"), 
+      where("email", "==", email),
+      limit(1)
+    );
+    const querySnapshot = await getDocs(q);
+    
+    if (!querySnapshot.empty) {
+      const doc = querySnapshot.docs[0];
+      return { id: doc.id, ...doc.data() };
+    }
+    return null;
+  } catch (error) {
+    console.error("Error getting document: ", error);
+  }
+};</pre
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3 class="subsection-title">Multiple Documents Select</h3>
+            <div class="method-grid">
+              <div class="method-card">
+                <div class="method-title">Get All Documents</div>
+                <div class="code-block">
+                  <pre>
+// Get all documents from collection
+const getAllUsers = async () => {
+  try {
+    const querySnapshot = await getDocs(collection(db, "users"));
+    const users = [];
+    
+    querySnapshot.forEach((doc) => {
+      users.push({ id: doc.id, ...doc.data() });
+    });
+    
+    return users;
+  } catch (error) {
+    console.error("Error getting documents: ", error);
+    return [];
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Get Documents with Conditions</div>
+                <div class="code-block">
+                  <pre>
+// Get documents with where conditions
+const getUsersByAge = async (minAge, maxAge) => {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("age", ">=", minAge),
+      where("age", "<=", maxAge),
+      orderBy("age", "asc")
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const users = [];
+    
+    querySnapshot.forEach((doc) => {
+      users.push({ id: doc.id, ...doc.data() });
+    });
+    
+    return users;
+  } catch (error) {
+    console.error("Error getting documents: ", error);
+    return [];
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Get Documents with Pagination</div>
+                <div class="code-block">
+                  <pre>
+// Paginated query
+import { startAfter, startAt } from 'firebase/firestore';
+
+const getUsersPaginated = async (pageSize = 10, lastDoc = null) => {
+  try {
+    let q = query(
+      collection(db, "users"),
+      orderBy("createdAt", "desc"),
+      limit(pageSize)
+    );
+    
+    if (lastDoc) {
+      q = query(q, startAfter(lastDoc));
+    }
+    
+    const querySnapshot = await getDocs(q);
+    const users = [];
+    let lastDocument = null;
+    
+    querySnapshot.forEach((doc) => {
+      users.push({ id: doc.id, ...doc.data() });
+      lastDocument = doc;
+    });
+    
+    return { users, lastDocument };
+  } catch (error) {
+    console.error("Error getting paginated documents: ", error);
+    return { users: [], lastDocument: null };
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Complex Queries</div>
+                <div class="code-block">
+                  <pre>
+// Complex query with multiple conditions
+const getActiveAdultUsers = async () => {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("age", ">=", 18),
+      where("status", "==", "active"),
+      where("verified", "==", true),
+      orderBy("lastLogin", "desc"),
+      limit(50)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error with complex query: ", error);
+    return [];
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Array Contains Query</div>
+                <div class="code-block">
+                  <pre>
+// Query documents where array field contains value
+const getUsersBySkill = async (skill) => {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("skills", "array-contains", skill)
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error querying by skill: ", error);
+    return [];
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">IN Query (Multiple Values)</div>
+                <div class="code-block">
+                  <pre>
+// Query documents where field matches any value in array
+const getUsersByIds = async (userIds) => {
+  try {
+    // Firestore limits 'in' queries to 10 values
+    if (userIds.length > 10) {
+      console.warn("IN query limited to 10 values");
+      userIds = userIds.slice(0, 10);
+    }
+    
+    const q = query(
+      collection(db, "users"),
+      where("__name__", "in", userIds.map(id => doc(db, "users", id)))
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error with IN query: ", error);
+    return [];
+  }
+};</pre
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Update Operations -->
+        <section id="update" class="section">
+          <h2 class="section-title">Update Operations</h2>
+
+          <div class="method-grid">
+            <div class="method-card">
+              <div class="method-title">Update Single Document</div>
+              <div class="code-block">
+                <pre>
+// Update specific fields of a document
+const updateUser = async (userId, updates) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      ...updates,
+      updatedAt: new Date()
+    });
+    console.log("Document updated successfully");
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Update with Field Operations</div>
+              <div class="code-block">
+                <pre>
+// Update with special field operations
+import { 
+  increment, 
+  arrayUnion, 
+  arrayRemove, 
+  serverTimestamp 
+} from 'firebase/firestore';
+
+const updateUserWithOperations = async (userId) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      // Increment a numeric field
+      loginCount: increment(1),
+      
+      // Add items to array (only if not present)
+      skills: arrayUnion("JavaScript", "React"),
+      
+      // Remove items from array
+      oldSkills: arrayRemove("jQuery"),
+      
+      // Set server timestamp
+      lastLogin: serverTimestamp(),
+      
+      // Nested field update
+      "profile.isActive": true,
+      "profile.preferences.theme": "dark"
+    });
+    console.log("Document updated with operations");
+  } catch (error) {
+    console.error("Error updating document: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Conditional Update</div>
+              <div class="code-block">
+                <pre>
+// Update document only if it exists
+const conditionalUpdate = async (userId, updates) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists()) {
+      await updateDoc(userRef, {
+        ...updates,
+        updatedAt: new Date()
+      });
+      console.log("Document updated");
+      return true;
+    } else {
+      console.log("Document does not exist");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error in conditional update: ", error);
+    return false;
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Batch Update</div>
+              <div class="code-block">
+                <pre>
+// Update multiple documents at once
+const batchUpdateUsers = async (updates) => {
+  const batch = writeBatch(db);
+  
+  updates.forEach(({ userId, data }) => {
+    const userRef = doc(db, "users", userId);
+    batch.update(userRef, {
+      ...data,
+      updatedAt: new Date()
+    });
+  });
+  
+  try {
+    await batch.commit();
+    console.log("Batch update successful");
+  } catch (error) {
+    console.error("Batch update failed: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Delete Operations -->
+        <section id="delete" class="section">
+          <h2 class="section-title">Delete Operations</h2>
+
+          <div class="subsection">
+            <h3 class="subsection-title">Single Delete Operations</h3>
+            <div class="method-grid">
+              <div class="method-card">
+                <div class="method-title">Delete Single Document by ID</div>
+                <div class="code-block">
+                  <pre>
+// Delete a single document by ID
+const deleteUser = async (userId) => {
+  try {
+    await deleteDoc(doc(db, "users", userId));
+    console.log("Document deleted successfully");
+    return true;
+  } catch (error) {
+    console.error("Error deleting document: ", error);
+    return false;
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Conditional Delete</div>
+                <div class="code-block">
+                  <pre>
+// Delete document only if it meets condition
+const conditionalDelete = async (userId) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    const userSnap = await getDoc(userRef);
+    
+    if (userSnap.exists() && userSnap.data().status === "inactive") {
+      await deleteDoc(userRef);
+      console.log("Inactive user deleted");
+      return true;
+    } else {
+      console.log("User not found or not inactive");
+      return false;
+    }
+  } catch (error) {
+    console.error("Error in conditional delete: ", error);
+    return false;
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Soft Delete (Mark as Deleted)</div>
+                <div class="code-block">
+                  <pre>
+// Soft delete - mark as deleted instead of removing
+const softDeleteUser = async (userId) => {
+  try {
+    const userRef = doc(db, "users", userId);
+    await updateDoc(userRef, {
+      deleted: true,
+      deletedAt: new Date(),
+      status: "deleted"
+    });
+    console.log("User soft deleted");
+    return true;
+  } catch (error) {
+    console.error("Error soft deleting user: ", error);
+    return false;
+  }
+};</pre
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3 class="subsection-title">Multiple Delete Operations</h3>
+            <div class="method-grid">
+              <div class="method-card">
+                <div class="method-title">Delete Multiple Documents by IDs</div>
+                <div class="code-block">
+                  <pre>
+// Delete multiple documents by their IDs
+const deleteMultipleUsers = async (userIds) => {
+  const batch = writeBatch(db);
+  
+  userIds.forEach(userId => {
+    const userRef = doc(db, "users", userId);
+    batch.delete(userRef);
+  });
+  
+  try {
+    await batch.commit();
+    console.log(`${userIds.length} users deleted successfully`);
+    return true;
+  } catch (error) {
+    console.error("Error deleting multiple users: ", error);
+    return false;
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Delete Documents Matching Query</div>
+                <div class="code-block">
+                  <pre>
+// Delete all documents matching a query
+const deleteInactiveUsers = async () => {
+  try {
+    // First, get documents to delete
+    const q = query(
+      collection(db, "users"),
+      where("lastLogin", "<", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000)) // 90 days ago
+    );
+    
+    const querySnapshot = await getDocs(q);
+    
+    // Delete in batches (Firestore batch limit: 500 operations)
+    const batch = writeBatch(db);
+    let batchCount = 0;
+    
+    for (const document of querySnapshot.docs) {
+      batch.delete(document.ref);
+      batchCount++;
+      
+      // Commit batch when it reaches 500 operations
+      if (batchCount === 500) {
+        await batch.commit();
+        batchCount = 0;
+      }
+    }
+    
+    // Commit remaining operations
+    if (batchCount > 0) {
+      await batch.commit();
+    }
+    
+    console.log(`${querySnapshot.docs.length} inactive users deleted`);
+    return querySnapshot.docs.length;
+  } catch (error) {
+    console.error("Error deleting inactive users: ", error);
+    return 0;
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Bulk Soft Delete</div>
+                <div class="code-block">
+                  <pre>
+// Soft delete multiple documents matching query
+const bulkSoftDelete = async (condition) => {
+  try {
+    const q = query(collection(db, "users"), where("status", "==", condition));
+    const querySnapshot = await getDocs(q);
+    
+    const batch = writeBatch(db);
+    const deletedIds = [];
+    
+    querySnapshot.forEach((document) => {
+      batch.update(document.ref, {
+        deleted: true,
+        deletedAt: new Date(),
+        status: "deleted"
+      });
+      deletedIds.push(document.id);
+    });
+    
+    await batch.commit();
+    console.log(`${deletedIds.length} users soft deleted`);
+    return deletedIds;
+  } catch (error) {
+    console.error("Error in bulk soft delete: ", error);
+    return [];
+  }
+};</pre
+                  >
+                </div>
+              </div>
+
+              <div class="method-card">
+                <div class="method-title">Delete with Confirmation</div>
+                <div class="code-block">
+                  <pre>
+// Delete with user confirmation and error handling
+const deleteWithConfirmation = async (userIds, confirmationText) => {
+  if (confirmationText !== "DELETE") {
+    throw new Error("Confirmation text must be 'DELETE'");
+  }
+  
+  try {
+    // Get user data before deletion for logging
+    const usersToDelete = [];
+    for (const userId of userIds) {
+      const userDoc = await getDoc(doc(db, "users", userId));
+      if (userDoc.exists()) {
+        usersToDelete.push({ id: userId, ...userDoc.data() });
+      }
+    }
+    
+    // Create deletion batch
+    const batch = writeBatch(db);
+    userIds.forEach(userId => {
+      batch.delete(doc(db, "users", userId));
+    });
+    
+    // Log deletion attempt
+    await addDoc(collection(db, "deletionLogs"), {
+      deletedUsers: usersToDelete,
+      deletedAt: new Date(),
+      deletedBy: "admin" // or current user ID
+    });
+    
+    // Commit deletion
+    await batch.commit();
+    
+    console.log(`${userIds.length} users deleted and logged`);
+    return { success: true, deletedCount: userIds.length };
+  } catch (error) {
+    console.error("Error in confirmed deletion: ", error);
+    return { success: false, error: error.message };
+  }
+};</pre
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Advanced Operations -->
+        <section id="advanced" class="section">
+          <h2 class="section-title">Advanced Operations</h2>
+
+          <div class="method-grid">
+            <div class="method-card">
+              <div class="method-title">Subcollection CRUD</div>
+              <div class="code-block">
+                <pre>
+// Working with subcollections
+const addPostToUser = async (userId, postData) => {
+  try {
+    const postRef = await addDoc(
+      collection(db, "users", userId, "posts"), 
+      postData
+    );
+    return postRef.id;
+  } catch (error) {
+    console.error("Error adding post: ", error);
+  }
+};
+
+const getUserPosts = async (userId) => {
+  try {
+    const postsSnapshot = await getDocs(
+      collection(db, "users", userId, "posts")
+    );
+    return postsSnapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error getting posts: ", error);
+    return [];
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Collection Group Query</div>
+              <div class="code-block">
+                <pre>
+// Query across all subcollections
+import { collectionGroup } from 'firebase/firestore';
+
+const getAllPostsFromAllUsers = async () => {
+  try {
+    const q = query(
+      collectionGroup(db, "posts"),
+      where("published", "==", true),
+      orderBy("createdAt", "desc")
+    );
+    
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({
+      id: doc.id,
+      path: doc.ref.path, // Full path to the document
+      ...doc.data()
+    }));
+  } catch (error) {
+    console.error("Error with collection group query: ", error);
+    return [];
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Document References</div>
+              <div class="code-block">
+                <pre>
+// Using document references for relationships
+const createPostWithAuthor = async (authorId, postData) => {
+  try {
+    const authorRef = doc(db, "users", authorId);
+    
+    const postRef = await addDoc(collection(db, "posts"), {
+      ...postData,
+      author: authorRef, // Store reference to author
+      createdAt: new Date()
+    });
+    
+    return postRef.id;
+  } catch (error) {
+    console.error("Error creating post with author: ", error);
+  }
+};
+
+// Query posts and populate author data
+const getPostsWithAuthors = async () => {
+  try {
+    const postsSnapshot = await getDocs(collection(db, "posts"));
+    const posts = [];
+    
+    for (const postDoc of postsSnapshot.docs) {
+      const postData = postDoc.data();
+      
+      // Get author data from reference
+      if (postData.author) {
+        const authorDoc = await getDoc(postData.author);
+        postData.authorData = authorDoc.exists() ? authorDoc.data() : null;
+      }
+      
+      posts.push({ id: postDoc.id, ...postData });
+    }
+    
+    return posts;
+  } catch (error) {
+    console.error("Error getting posts with authors: ", error);
+    return [];
+  }
+};</pre
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Real-time Listeners -->
+        <section id="realtime" class="section">
+          <h2 class="section-title">Real-time Listeners</h2>
+
+          <div class="method-grid">
+            <div class="method-card">
+              <div class="method-title">Document Listener</div>
+              <div class="code-block">
+                <pre>
+// Listen to real-time changes on a single document
+const listenToUser = (userId, callback) => {
+  const unsubscribe = onSnapshot(
+    doc(db, "users", userId),
+    (doc) => {
+      if (doc.exists()) {
+        callback({ id: doc.id, ...doc.data() });
+      } else {
+        callback(null);
+      }
+    },
+    (error) => {
+      console.error("Error listening to user: ", error);
+    }
+  );
+  
+  // Return unsubscribe function
+  return unsubscribe;
+};
+
+// Usage
+const unsubscribe = listenToUser("user123", (userData) => {
+  if (userData) {
+    console.log("User updated:", userData);
+    // Update UI with new data
+  } else {
+    console.log("User deleted or not found");
+  }
+});
+
+// Stop listening
+// unsubscribe();</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Collection Listener</div>
+              <div class="code-block">
+                <pre>
+// Listen to real-time changes on a collection
+const listenToUsers = (callback) => {
+  const q = query(
+    collection(db, "users"),
+    where("status", "==", "active"),
+    orderBy("lastLogin", "desc")
+  );
+  
+  const unsubscribe = onSnapshot(
+    q,
+    (querySnapshot) => {
+      const users = [];
+      querySnapshot.forEach((doc) => {
+        users.push({ id: doc.id, ...doc.data() });
+      });
+      callback(users);
+    },
+    (error) => {
+      console.error("Error listening to users: ", error);
+    }
+  );
+  
+  return unsubscribe;
+};
+
+// Listen to changes with metadata
+const listenToUsersWithMetadata = (callback) => {
+  const unsubscribe = onSnapshot(
+    collection(db, "users"),
+    { includeMetadataChanges: true },
+    (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          console.log("New user: ", change.doc.data());
+        }
+        if (change.type === "modified") {
+          console.log("Modified user: ", change.doc.data());
+        }
+        if (change.type === "removed") {
+          console.log("Removed user: ", change.doc.data());
+        }
+      });
+      
+      // Check if changes are from cache
+      if (snapshot.metadata.fromCache) {
+        console.log("Data from cache");
+      } else {
+        console.log("Data from server");
+      }
+    }
+  );
+  
+  return unsubscribe;
+};</pre
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Batch Operations -->
+        <section id="batch" class="section">
+          <h2 class="section-title">Batch Operations</h2>
+
+          <div class="method-grid">
+            <div class="method-card">
+              <div class="method-title">Mixed Batch Operations</div>
+              <div class="code-block">
+                <pre>
+// Perform multiple operations in a single batch
+const performBatchOperations = async () => {
+  const batch = writeBatch(db);
+  
+  // Add new document
+  const newUserRef = doc(collection(db, "users"));
+  batch.set(newUserRef, {
+    name: "New User",
+    email: "newuser@example.com",
+    createdAt: new Date()
+  });
+  
+  // Update existing document
+  const existingUserRef = doc(db, "users", "existing-user-id");
+  batch.update(existingUserRef, {
+    lastLogin: new Date(),
+    loginCount: increment(1)
+  });
+  
+  // Delete document
+  const userToDeleteRef = doc(db, "users", "user-to-delete-id");
+  batch.delete(userToDeleteRef);
+  
+  try {
+    await batch.commit();
+    console.log("Batch operations completed successfully");
+  } catch (error) {
+    console.error("Batch operations failed: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Large Batch Processing</div>
+              <div class="code-block">
+                <pre>
+// Handle large datasets with batch size limits
+const processLargeDataset = async (data) => {
+  const BATCH_SIZE = 500; // Firestore limit
+  
+  for (let i = 0; i < data.length; i += BATCH_SIZE) {
+    const batch = writeBatch(db);
+    const batchData = data.slice(i, i + BATCH_SIZE);
+    
+    batchData.forEach((item, index) => {
+      const docRef = doc(collection(db, "users"));
+      batch.set(docRef, {
+        ...item,
+        batchNumber: Math.floor(i / BATCH_SIZE) + 1,
+        indexInBatch: index,
+        createdAt: new Date()
+      });
+    });
+    
+    try {
+      await batch.commit();
+      console.log(`Batch ${Math.floor(i / BATCH_SIZE) + 1} completed`);
+    } catch (error) {
+      console.error(`Batch ${Math.floor(i / BATCH_SIZE) + 1} failed:`, error);
+    }
+  }
+};</pre
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Transactions -->
+        <section id="transactions" class="section">
+          <h2 class="section-title">Transactions</h2>
+
+          <div class="method-grid">
+            <div class="method-card">
+              <div class="method-title">Basic Transaction</div>
+              <div class="code-block">
+                <pre>
+// Atomic transaction example
+import { runTransaction } from 'firebase/firestore';
+
+const transferPoints = async (fromUserId, toUserId, points) => {
+  try {
+    await runTransaction(db, async (transaction) => {
+      // Read both users
+      const fromUserRef = doc(db, "users", fromUserId);
+      const toUserRef = doc(db, "users", toUserId);
+      
+      const fromUserDoc = await transaction.get(fromUserRef);
+      const toUserDoc = await transaction.get(toUserRef);
+      
+      if (!fromUserDoc.exists()) {
+        throw new Error("Source user does not exist!");
+      }
+      
+      if (!toUserDoc.exists()) {
+        throw new Error("Destination user does not exist!");
+      }
+      
+      const fromUserPoints = fromUserDoc.data().points || 0;
+      
+      if (fromUserPoints < points) {
+        throw new Error("Insufficient points!");
+      }
+      
+      // Update both users
+      transaction.update(fromUserRef, {
+        points: fromUserPoints - points
+      });
+      
+      transaction.update(toUserRef, {
+        points: (toUserDoc.data().points || 0) + points
+      });
+    });
+    
+    console.log("Points transferred successfully!");
+  } catch (error) {
+    console.error("Transaction failed: ", error);
+  }
+};</pre
+                >
+              </div>
+            </div>
+
+            <div class="method-card">
+              <div class="method-title">Complex Transaction</div>
+              <div class="code-block">
+                <pre>
+// Complex transaction with multiple operations
+const createOrderWithInventory = async (userId, items) => {
+  try {
+    const result = await runTransaction(db, async (transaction) => {
+      const results = [];
+      
+      // Check inventory for all items
+      for (const item of items) {
+        const productRef = doc(db, "products", item.productId);
+        const productDoc = await transaction.get(productRef);
+        
+        if (!productDoc.exists()) {
+          throw new Error(`Product ${item.productId} not found`);
+        }
+        
+        const stock = productDoc.data().stock || 0;
+        if (stock < item.quantity) {
+          throw new Error(`Insufficient stock for ${item.productId}`);
+        }
+        
+        results.push({
+          productRef,
+          currentStock: stock,
+          orderedQuantity: item.quantity
+        });
+      }
+      
+      // Create order
+      const orderRef = doc(collection(db, "orders"));
+      transaction.set(orderRef, {
+        userId,
+        items,
+        status: "pending",
+        total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+        createdAt: new Date()
+      });
+      
+      // Update inventory
+      results.forEach(({ productRef, currentStock, orderedQuantity }) => {
+        transaction.update(productRef, {
+          stock: currentStock - orderedQuantity,
+          lastOrdered: new Date()
+        });
+      });
+      
+      return orderRef.id;
+    });
+    
+    console.log("Order created with ID: ", result);
+    return result;
+  } catch (error) {
+    console.error("Order creation failed: ", error);
+    return null;
+  }
+};</pre
+                >
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Best Practices -->
+        <section id="best-practices" class="section">
+          <h2 class="section-title">Best Practices & Security</h2>
+
+          <div class="subsection">
+            <h3 class="subsection-title">Error Handling & Validation</h3>
+            <div class="code-block">
+              <pre>
+// Comprehensive error handling and validation
+class UserService {
+  constructor(db) {
+    this.db = db;
+    this.collection = collection(db, "users");
+  }
+  
+  // Validate user data
+  validateUser(userData) {
+    const errors = [];
+    
+    if (!userData.email || !userData.email.includes('@')) {
+      errors.push('Valid email is required');
+    }
+    
+    if (!userData.name || userData.name.trim().length < 2) {
+      errors.push('Name must be at least 2 characters');
+    }
+    
+    if (userData.age && (userData.age < 0 || userData.age > 150)) {
+      errors.push('Age must be between 0 and 150');
+    }
+    
+    return errors;
+  }
+  
+  // Create user with validation
+  async createUser(userData) {
+    const errors = this.validateUser(userData);
+    if (errors.length > 0) {
+      throw new Error(`Validation failed: ${errors.join(', ')}`);
+    }
+    
+    try {
+      // Check if email already exists
+      const existingUser = await this.getUserByEmail(userData.email);
+      if (existingUser) {
+        throw new Error('User with this email already exists');
+      }
+      
+      const docRef = await addDoc(this.collection, {
+        ...userData,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+      
+      return { success: true, id: docRef.id };
+    } catch (error) {
+      console.error('Error creating user:', error);
+      return { success: false, error: error.message };
+    }
+  }
+  
+  // Get user by email with caching
+  async getUserByEmail(email) {
+    try {
+      const q = query(this.collection, where("email", "==", email), limit(1));
+      const querySnapshot = await getDocs(q);
+      
+      if (!querySnapshot.empty) {
+        const doc = querySnapshot.docs[0];
+        return { id: doc.id, ...doc.data() };
+      }
+      
+      return null;
+    } catch (error) {
+      console.error('Error getting user by email:', error);
+      throw error;
+    }
+  }
+}</pre
+              >
+            </div>
+          </div>
+
+          <div class="subsection">
+            <h3 class="subsection-title">Security Rules Examples</h3>
+            <div class="code-block">
+              <pre>
+// Firestore Security Rules
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null 
+        && request.auth.uid == userId
+        && validateUserData(resource.data);
+    }
+    
+    // Public read, authenticated write for posts
+    match /posts/{postId} {
+      allow read: if true;
+      allow create, update: if request.auth != null 
+        && request.auth.uid == resource.data.authorId;
+      allow delete: if request.auth != null 
+        && (request.auth.uid == resource.data.authorId 
+            || request.auth.token.admin == true);
+    }
+    
+    // Private subcollections
+    match /users/{userId}/private/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+  
+  // Validation function
+  function validateUserData(data) {
+    return data.keys().hasAll(['name', 'email', 'createdAt']) &&
+           data.name is string &&
+           data.name.size() >= 2 &&
+           data.email.matches('.*@.*\\..*');
+  }
+}</pre
+              >
+            </div>
+          </div>
+
+          <div class="note">
+            <strong>Performance Tips:</strong>
+            <ul style="margin-top: 10px; padding-left: 20px">
+              <li>Use indexes for queries with where clauses and orderBy</li>
+              <li>Limit query results to avoid reading unnecessary data</li>
+              <li>Use subcollections for hierarchical data</li>
+              <li>Batch writes when possible (up to 500 operations)</li>
+              <li>Use transactions for atomic operations</li>
+              <li>Cache frequently accessed data locally</li>
+            </ul>
+          </div>
+
+          <div class="warning">
+            <strong>Common Pitfalls:</strong>
+            <ul style="margin-top: 10px; padding-left: 20px">
+              <li>Don't forget to handle offline scenarios</li>
+              <li>Always validate data before writing to Firestore</li>
+              <li>Be careful with security rules - test thoroughly</li>
+              <li>Monitor usage to avoid exceeding quotas</li>
+              <li>Use appropriate data structure - avoid deep nesting</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script>
+      // Add smooth scrolling for anchor links
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      // Modal functionality
+      const modal = document.getElementById("codeModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalCode = document.getElementById("modalCode");
+      const closeModal = document.getElementById("closeModal");
+      const modalCopyBtn = document.getElementById("modalCopyBtn");
+
+      // Add click handlers to code blocks for modal
+      document.querySelectorAll(".code-block").forEach((block, index) => {
+        // Add copy button to each code block
+        const button = document.createElement("button");
+        button.innerHTML = "📋";
+        button.className = "copy-btn";
+        button.title = "Copy to clipboard";
+
+        block.style.position = "relative";
+        block.appendChild(button);
+
+        // Copy button functionality
+        button.addEventListener("click", (e) => {
+          e.stopPropagation(); // Prevent modal from opening
+          const text = block.querySelector("pre").textContent;
+          navigator.clipboard.writeText(text).then(() => {
+            button.innerHTML = "✅";
+            setTimeout(() => {
+              button.innerHTML = "📋";
+            }, 2000);
+          });
+        });
+
+        // Make code block clickable to open modal
+        block.addEventListener("click", () => {
+          const methodCard = block.closest(".method-card");
+          const subsection = block.closest(".subsection");
+          let title = "Code Example";
+
+          if (methodCard) {
+            const methodTitleElement =
+              methodCard.querySelector(".method-title");
+            if (methodTitleElement) {
+              title = methodTitleElement.textContent;
+            }
+          } else if (subsection) {
+            const subsectionTitleElement =
+              subsection.querySelector(".subsection-title");
+            if (subsectionTitleElement) {
+              title = subsectionTitleElement.textContent;
+            }
+          }
+
+          modalTitle.textContent = title;
+          modalCode.textContent = block.querySelector("pre").textContent;
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden"; // Prevent background scrolling
+        });
+      });
+
+      // Modal copy button functionality
+      modalCopyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(modalCode.textContent).then(() => {
+          const originalText = modalCopyBtn.innerHTML;
+          modalCopyBtn.innerHTML = "✅ Copied!";
+          setTimeout(() => {
+            modalCopyBtn.innerHTML = originalText;
+          }, 2000);
+        });
+      });
+
+      // Close modal functionality
+      closeModal.addEventListener("click", () => {
+        modal.style.display = "none";
+        document.body.style.overflow = "auto"; // Re-enable background scrolling
+      });
+
+      // Close modal when clicking outside of it
+      window.addEventListener("click", (event) => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+          document.body.style.overflow = "auto";
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && modal.style.display === "block") {
+          modal.style.display = "none";
+          document.body.style.overflow = "auto";
+        }
+      });
+
+      // Add keyboard navigation for accessibility
+      document.addEventListener("keydown", (event) => {
+        if (
+          event.target.classList.contains("code-block") &&
+          event.key === "Enter"
+        ) {
+          event.target.click();
+        }
+      });
+
+      // Make code blocks focusable for accessibility
+      document.querySelectorAll(".code-block").forEach((block) => {
+        block.setAttribute("tabindex", "0");
+        block.setAttribute("role", "button");
+        block.setAttribute("aria-label", "Click to expand code example");
+      });
+    </script>
+  </body>
+</html>
